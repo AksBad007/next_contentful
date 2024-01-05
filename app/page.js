@@ -1,5 +1,6 @@
 import { createClient } from "contentful";
-import RecipeCard from "@/components/RecipeCard";
+import RecipeCard from "@components/RecipeCard";
+import { revalidatePath } from "next/cache";
 
 const client = createClient({
   space: process.env.CONTENTFUL_SPACE_ID,
@@ -8,6 +9,7 @@ const client = createClient({
 
 async function getRecipes() {
   const { items } = await client.getEntries({ content_type: "recipe" });
+  revalidatePath('/')
   return items;
 }
 
@@ -18,7 +20,7 @@ export default async function Home() {
     <main className="flex min-h-screen flex-col items-center p-24">
       <h1 className="text-6xl">Cooking Blog</h1>
 
-      <div className="mt-8 flex flex-wrap gap-12">
+      <div className="mt-8 grid md:grid-cols-2 gap-12">
         {recipes.map(({ fields, sys }) => (
           <RecipeCard key={sys.id} recipe={fields} />
         ))}
